@@ -1,127 +1,197 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Promedio de Calificaciones Alfabéticas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f3f3;
-            text-align: center;
-            padding: 40px;
-        }
-        .container {
-            background-color: white;
-            width: 380px;
-            margin: auto;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-        h2 {
-            color: #333;
-        }
-        input {
-            width: 80%;
-            margin: 5px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 16px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px;
-            width: 80%;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        p {
-            font-weight: bold;
-            color: #333;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Promedio de Calificaciones Alfabéticas</title>
+  <style>
+    :root{
+      --bg:#f3f3f3;
+      --card:#ffffff;
+      --text:#222;
+      --muted:#666;
+      --primary:#0d6efd;
+      --primary-dark:#0a58ca;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+      color:var(--text);
+      display:flex;
+      min-height:100dvh;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .card{
+      width:min(720px,95vw);
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+      padding:28px;
+    }
+    h1{font-size:1.4rem;margin:0 0 8px}
+    p.help{margin:0 0 16px;color:var(--muted)}
+    .controls{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:end;
+      margin:12px 0 18px;
+    }
+    label{font-weight:600}
+    input[type="number"], select, button{
+      height:40px;
+      border:1px solid #d9d9d9;
+      border-radius:10px;
+      padding:0 12px;
+      font-size:16px;
+    }
+    input[type="number"]:focus, select:focus, button:focus{outline:2px solid #bcd2ff;outline-offset:2px}
+    button{
+      background:var(--primary);
+      color:#fff;
+      border:none;
+      cursor:pointer;
+    }
+    button:hover{background:var(--primary-dark)}
+
+    /* Lista de notas generadas dinámicamente */
+    #notas{
+      display:grid;
+      gap:10px;
+      margin:4px 0 18px;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 180px; /* etiqueta a la izquierda, casilla a la derecha */
+      gap:10px;
+      align-items:center;
+      background:#fafafa;
+      border:1px solid #eee;
+      border-radius:10px;
+      padding:10px 12px;
+    }
+    .row label{font-weight:500}
+    .footer{
+      display:flex;gap:12px;align-items:center;flex-wrap:wrap
+    }
+    #resultado{font-weight:700;min-height:2.2em}
+    .table-equivalencias{
+      margin-top:12px;
+      font-size:.95rem;
+      color:var(--muted);
+    }
+    .table-equivalencias code{background:#f5f5f5;padding:2px 6px;border-radius:6px}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Calculadora de Promedio Alfabético</h2>
-        <p>Ingresa tus calificaciones (A+, A, A-, B+, B, B-, C, D, E, F)</p>
-        
-        <input type="text" id="nota1" placeholder="Nota 1">
-        <input type="text" id="nota2" placeholder="Nota 2">
-        <input type="text" id="nota3" placeholder="Nota 3">
-        <input type="text" id="nota4" placeholder="Nota 4">
-        
-        <button onclick="calcularPromedio()">Calcular Promedio</button>
-        <p id="resultado"></p>
+  <div class="card">
+    <h1>Calculadora de Promedio Alfabético</h1>
+    <p class="help">Indica cuántas notas quieres promediar y selecciona cada calificación.</p>
+
+    <div class="controls">
+      <div>
+        <label for="cantidad">¿Cuántas notas deseas ingresar? (máx. 10)</label>
+        <input id="cantidad" type="number" min="1" max="10" value="3" />
+      </div>
+      <button id="generar" type="button">Generar campos</button>
     </div>
 
-    <script>
-        // Tabla de equivalencias
-        function convertirLetraANumero(letra) {
-            const tabla = {
-                "A+": 2.0, "A": 1.8, "A-": 1.6,
-                "B+": 1.4, "B": 1.2, "B-": 1.0,
-                "C": 0.8, "D": 0.2, "E": 0.1, "F": 0.0
-            };
-            return tabla[letra.toUpperCase()] ?? null;
-        }
+    <div id="notas"></div>
 
-        function convertirNumeroALetra(valor) {
-            if (valor >= 1.9) return "A+";
-            else if (valor >= 1.7) return "A";
-            else if (valor >= 1.5) return "A-";
-            else if (valor >= 1.3) return "B+";
-            else if (valor >= 1.1) return "B";
-            else if (valor >= 0.9) return "B-";
-            else if (valor >= 0.7) return "C";
-            else if (valor >= 0.15) return "D";
-            else if (valor >= 0.05) return "E";
-            else return "F";
-        }
+    <div class="footer">
+      <button id="calcular" type="button">Calcular promedio</button>
+      <div id="resultado" aria-live="polite"></div>
+    </div>
 
-        function calcularPromedio() {
-            const notas = [
-                document.getElementById("nota1").value,
-                document.getElementById("nota2").value,
-                document.getElementById("nota3").value,
-                document.getElementById("nota4").value
-            ];
+    <div class="table-equivalencias">
+      Equivalencias: <code>A+=2</code>, <code>A=1.8</code>, <code>A-=1.6</code>, <code>B+=1.4</code>, <code>B=1.2</code>, <code>B-=1</code>, <code>C=0.8</code>, <code>D=0.2</code>, <code>E=0.1</code>, <code>F=0</code>.
+    </div>
+  </div>
 
-            let suma = 0, count = 0;
-            for (let n of notas) {
-                if (n.trim() !== "") {
-                    const valor = convertirLetraANumero(n.trim());
-                    if (valor !== null) {
-                        suma += valor;
-                        count++;
-                    } else {
-                        document.getElementById("resultado").innerText = `❌ Error: "${n}" no es una nota válida.`;
-                        return;
-                    }
-                }
-            }
+  <script>
+    const MAPA = {
+      "A+":2.0, "A":1.8, "A-":1.6,
+      "B+":1.4, "B":1.2, "B-":1.0,
+      "C":0.8, "D":0.2, "E":0.1, "F":0.0
+    };
+    const OPCIONES = ["A+","A","A-","B+","B","B-","C","D","E","F"];
 
-            if (count === 0) {
-                document.getElementById("resultado").innerText = "⚠️ Ingresa al menos una nota.";
-                return;
-            }
+    const $cantidad = document.getElementById('cantidad');
+    const $generar  = document.getElementById('generar');
+    const $notas    = document.getElementById('notas');
+    const $calcular = document.getElementById('calcular');
+    const $resultado= document.getElementById('resultado');
 
-            const promedio = suma / count;
-            const letra = convertirNumeroALetra(promedio);
+    function crearFilaNota(i){
+      const row = document.createElement('div');
+      row.className = 'row';
 
-            document.getElementById("resultado").innerHTML =
-                `Promedio numérico: ${promedio.toFixed(2)} <br> Equivalente alfabético: ${letra}`;
-        }
-    </script>
+      const lab = document.createElement('label');
+      lab.htmlFor = `nota-${i}`;
+      lab.textContent = `Nota ${i}`;
+
+      const sel = document.createElement('select');
+      sel.id = `nota-${i}`;
+      sel.innerHTML = `<option value="" selected>-- Selecciona --</option>` +
+        OPCIONES.map(v=>`<option value="${v}">${v}</option>`).join('');
+
+      row.appendChild(lab);
+      row.appendChild(sel);
+      return row;
+    }
+
+    function renderNotas(){
+      let n = parseInt($cantidad.value, 10);
+      if (isNaN(n) || n < 1) n = 1;
+      if (n > 10) n = 10;
+      $cantidad.value = n;
+
+      $notas.innerHTML = '';
+      for (let i=1; i<=n; i++){
+        $notas.appendChild(crearFilaNota(i));
+      }
+      $resultado.textContent = '';
+    }
+
+    function convertirNumeroALetra(valor){
+      if (valor >= 1.9) return "A+";
+      if (valor >= 1.7) return "A";
+      if (valor >= 1.5) return "A-";
+      if (valor >= 1.3) return "B+";
+      if (valor >= 1.1) return "B";
+      if (valor >= 0.9) return "B-";
+      if (valor >= 0.7) return "C";
+      if (valor >= 0.15) return "D";
+      if (valor >= 0.05) return "E";
+      return "F";
+    }
+
+    function calcular(){
+      const selects = [...$notas.querySelectorAll('select')];
+      if (selects.length === 0){ $resultado.textContent = "Primero genera las notas."; return; }
+
+      for (const s of selects){
+        if (!s.value){ $resultado.textContent = "Completa todas las notas."; return; }
+      }
+
+      const valores = selects.map(s => MAPA[s.value]);
+      const suma = valores.reduce((a,b)=>a+b,0);
+      const prom = suma / valores.length;
+      const letra = convertirNumeroALetra(prom);
+
+      $resultado.innerHTML = `Promedio numérico: ${prom.toFixed(2)} &nbsp;|&nbsp; Equivalente alfabético: <strong>${letra}</strong>`;
+    }
+
+    $generar.addEventListener('click', renderNotas);
+    $cantidad.addEventListener('change', renderNotas);
+    $calcular.addEventListener('click', calcular);
+
+    renderNotas(); // inicial
+  </script>
 </body>
 </html>
