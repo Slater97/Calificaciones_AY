@@ -57,9 +57,10 @@
         }
 
         function convertirNumeroALetra(num) {
-            if (num >= 3.5) return 'A';
-            else if (num >= 2.5) return 'B';
-            else if (num >= 1.5) return 'C';
+            if (num >= 1.81) return 'A+';
+            else if (num >= 1.61) return 'A';
+            else if (num >= 1.41) return 'A-';
+            else if (num >= 1.21) return 'B+';
             else if (num >= 0.5) return 'D';
             else return 'F';
         }
