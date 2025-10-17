@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promedio de Calificaciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 40px;
+        }
+        .container {
+            background-color: white;
+            width: 350px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 80%;
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 80%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Calculadora de Promedio Alfabético</h2>
+        <input type="text" id="nota1" placeholder="Nota 1 (A,B,C...)">
+        <input type="text" id="nota2" placeholder="Nota 2 (A,B,C...)">
+        <input type="text" id="nota3" placeholder="Nota 3 (A,B,C...)">
+        <button onclick="calcularPromedio()">Calcular Promedio</button>
+        <p id="resultado"></p>
+    </div>
+
+    <script>
+        function convertirLetraANumero(letra) {
+            const tabla = { A: 4, B: 3, C: 2, D: 1, F: 0 };
+            return tabla[letra.toUpperCase()] || 0;
+        }
+
+        function convertirNumeroALetra(num) {
+            if (num >= 3.5) return 'A';
+            else if (num >= 2.5) return 'B';
+            else if (num >= 1.5) return 'C';
+            else if (num >= 0.5) return 'D';
+            else return 'F';
+        }
+
+        function calcularPromedio() {
+            let notas = [
+                document.getElementById('nota1').value,
+                document.getElementById('nota2').value,
+                document.getElementById('nota3').value
+            ];
+
+            let suma = 0, count = 0;
+            notas.forEach(n => {
+                if (n) {
+                    suma += convertirLetraANumero(n);
+                    count++;
+                }
+            });
+
+            if (count === 0) {
+                document.getElementById('resultado').innerText = "Ingrese al menos una nota.";
+                return;
+            }
+
+            let promedio = suma / count;
+            let letra = convertirNumeroALetra(promedio);
+            document.getElementById('resultado').innerText =
+                `Promedio numérico: ${promedio.toFixed(2)} → Letra: ${letra}`;
+        }
+    </script>
+</body>
+</html>
